@@ -43,7 +43,6 @@ function FloatingInput({
   onChange: (name: keyof FormState, value: string) => void;
   type?: string;
   required?: boolean;
-  i18nKey?: string;
 }) {
   return (
     <label className="group relative block">

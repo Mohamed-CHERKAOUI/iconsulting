@@ -19,9 +19,9 @@ const config: Config = {
         muted: "rgb(var(--color-muted) / <alpha-value>)"
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "Inter", "sans-serif"],
-        display: ["var(--font-space)", "Space Grotesk", "Inter", "sans-serif"],
-        mono: ["var(--font-mono)", "JetBrains Mono", "monospace"]
+        sans: ["Inter", "Segoe UI", "Arial", "sans-serif"],
+        display: ["Space Grotesk", "Inter", "Segoe UI", "Arial", "sans-serif"],
+        mono: ["JetBrains Mono", "Consolas", "monospace"]
       },
       boxShadow: {
         glow: "0 0 48px rgba(0, 194, 255, 0.28)",
