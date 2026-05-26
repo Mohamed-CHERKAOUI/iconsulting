@@ -27,6 +27,8 @@ const initialState: FormState = {
   message: ""
 };
 
+const contactEmail = "mohamedcherkaoui582@gmail.com";
+
 function FloatingInput({
   label,
   name,
@@ -66,6 +68,7 @@ export function ContactForm() {
   const [form, setForm] = useState<FormState>(initialState);
   const [loading, setLoading] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
+  const [deliveryMethod, setDeliveryMethod] = useState<"emailjs" | "mailto">("emailjs");
   const [countdown, setCountdown] = useState(10);
   const router = useRouter();
 
@@ -93,6 +96,28 @@ export function ContactForm() {
     setForm((current) => ({ ...current, [name]: value }));
   };
 
+  const openMailClient = () => {
+    const subject = `iConsulting consultation request - ${form.service}`;
+    const body = [
+      "New consultation request",
+      "",
+      `Name: ${form.name}`,
+      `Email: ${form.email}`,
+      form.company ? `Company: ${form.company}` : "",
+      form.phone ? `Phone: ${form.phone}` : "",
+      `Service: ${form.service}`,
+      "",
+      "Message:",
+      form.message
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    window.location.href = `mailto:${contactEmail}?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+  };
+
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!valid) {
@@ -106,7 +131,10 @@ export function ContactForm() {
       const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
       const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
       if (!serviceId || !templateId || !publicKey) {
-        throw new Error("Missing EmailJS configuration");
+        openMailClient();
+        setDeliveryMethod("mailto");
+        setSuccessOpen(true);
+        return;
       }
 
       await emailjs.send(
@@ -122,9 +150,13 @@ export function ContactForm() {
         },
         { publicKey }
       );
+      setDeliveryMethod("emailjs");
       setSuccessOpen(true);
     } catch {
-      toast.error("Something went wrong. Please try again or use your secure contact channel.");
+      openMailClient();
+      setDeliveryMethod("mailto");
+      setSuccessOpen(true);
+      toast.success("Opening your email application to complete the request.");
     } finally {
       setLoading(false);
     }
@@ -213,7 +245,10 @@ export function ContactForm() {
                 Consultation Request Received!
               </h2>
               <p data-i18n="receivedBody" className="mt-4 text-center leading-7 text-muted">
-                Your email has been successfully sent to our team. We will review your request and get back to you within <strong className="text-text">1 business day</strong>.
+                {deliveryMethod === "emailjs"
+                  ? "Your email has been successfully sent to our team. "
+                  : "Your email application has been opened with your request prepared. "}
+                We will review your request and get back to you within <strong className="text-text">1 business day</strong>.
               </p>
               <p className="mt-4 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-center text-sm text-muted">
                 <span data-i18n="confirmationSent">Confirmation sent to:</span> <span className="text-cyan">{form.email}</span>
