@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>iConsulting Preview</title>
+  <style>
+    :root {
+      --ink: #050A14;
+      --surface: #0D1626;
+      --electric: #0066FF;
+      --cyan: #00C2FF;
+      --violet: #7C3AED;
+      --cyber: #00FFB2;
+      --text: #F0F4FF;
+      --muted: #8A9BBE;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--ink);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
+    }
+    body:before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .08;
+      z-index: 10;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+    }
+    .nav {
+      position: fixed;
+      inset: 0 0 auto;
+      height: 80px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6vw;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      background: rgba(5,10,20,.82);
+      backdrop-filter: blur(22px);
+    }
+    .logo { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: -.03em; }
+    .shield {
+      width: 42px; height: 42px; border-radius: 14px;
+      display: grid; place-items: center;
+      background: rgba(0,194,255,.12);
+      border: 1px solid rgba(0,194,255,.32);
+      box-shadow: 0 0 42px rgba(0,194,255,.28);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    .links { display: flex; gap: 30px; color: var(--muted); font-size: 14px; }
+    .links span { position: relative; cursor: default; }
+    .links span:after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -9px; height: 1px;
+      transform: scaleX(0); transform-origin: left;
+      background: linear-gradient(90deg, var(--electric), var(--cyan));
+      transition: .3s;
+    }
+    .links span:hover { color: var(--text); }
+    .links span:hover:after { transform: scaleX(1); }
+    .btn {
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 22px;
+      color: white;
+      font-weight: 750;
+      text-decoration: none;
+      background: linear-gradient(90deg, var(--electric), var(--cyan));
+      box-shadow: 0 0 48px rgba(0,194,255,.28);
+      transition: .25s;
+    }
+    .btn:hover { transform: scale(1.04); box-shadow: 0 0 74px rgba(0,102,255,.45); }
+    .ghost { background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.12); box-shadow: none; }
+    .switches {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 30;
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      background: rgba(13,22,38,.86);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 0 42px rgba(0,194,255,.22);
+    }
+    .switches button {
+      height: 38px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text);
+      font-weight: 800;
+      padding: 0 13px;
+      cursor: pointer;
+    }
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      padding: 150px 6vw 80px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    #particles { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .hero:after {
+      content: "";
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 32%, rgba(0,102,255,.18), transparent 34%), linear-gradient(180deg, transparent, var(--ink) 94%);
+    }
+    .wrap { position: relative; z-index: 2; width: min(1180px, 100%); margin: 0 auto; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 12px;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.04);
+      border-radius: 999px;
+      padding: 10px 15px;
+      color: var(--muted);
+      font: 700 12px ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      backdrop-filter: blur(14px);
+      animation: up .7s ease both;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cyber); box-shadow: 0 0 18px rgba(0,255,178,.9); }
+    h1 {
+      margin: 28px 0 0;
+      max-width: 980px;
+      font-size: clamp(54px, 9vw, 124px);
+      line-height: .92;
+      letter-spacing: -.06em;
+    }
+    h1 span { display: inline-block; margin-right: .18em; animation: word .75s ease both; }
+    h1 span:nth-child(2) { animation-delay: .15s; }
+    h1 span:nth-child(3) { animation-delay: .3s; }
+    .lead {
+      max-width: 680px;
+      margin: 30px 0 0;
+      color: var(--muted);
+      font-size: 21px;
+      line-height: 1.65;
+      animation: up .75s .42s ease both;
+    }
+    .actions { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 38px; animation: up .75s .5s ease both; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 56px; }
+    .stat, .card, .step, .article, .side, .form {
+      border: 1px solid rgba(255,255,255,.075);
+      background: rgba(255,255,255,.035);
+      backdrop-filter: blur(18px);
+      border-radius: 22px;
+    }
+    .stat { padding: 20px; display: flex; align-items: center; gap: 16px; }
+    .ring {
+      width: 88px; height: 88px; border-radius: 50%;
+      display: grid; place-items: center;
+      background: conic-gradient(from 0deg, var(--electric), var(--cyan), var(--cyber) 82%, rgba(255,255,255,.08) 0);
+      box-shadow: 0 0 34px rgba(0,194,255,.2);
+    }
+    .ring b {
+      width: 68px; height: 68px; border-radius: 50%;
+      display: grid; place-items: center;
+      background: #07101e;
+      font-family: ui-monospace, monospace;
+    }
+    .stat p { color: var(--muted); margin: 0; line-height: 1.45; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 10px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 999px;
+      padding: 10px 16px;
+      color: var(--muted);
+      background: rgba(255,255,255,.04);
+      white-space: nowrap;
+    }
+    section { padding: 100px 6vw; }
+    .section-head { max-width: 760px; margin: 0 auto 55px; text-align: center; }
+    .eyebrow { color: var(--cyber); font: 800 12px ui-monospace, monospace; letter-spacing: .22em; text-transform: uppercase; }
+    h2 { margin: 16px 0 0; font-size: clamp(34px, 5vw, 58px); line-height: 1.02; letter-spacing: -.05em; }
+    .muted { color: var(--muted); line-height: 1.75; }
+    .services { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; width: min(1180px, 100%); margin: 0 auto; }
+    .card { grid-column: span 2; padding: 28px; min-height: 260px; transition: .25s; }
+    .card:nth-child(n+4) { grid-column: span 3; }
+    .card:hover, .article:hover, .step:hover { transform: translateY(-8px); border-color: rgba(0,194,255,.45); box-shadow: 0 0 48px rgba(0,194,255,.22); }
+    .icon {
+      width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center;
+      background: rgba(0,194,255,.1); border: 1px solid rgba(0,194,255,.22); color: var(--cyan); font-size: 24px;
+    }
+    .card h3, .step h3, .article h3 { letter-spacing: -.03em; font-size: 21px; margin: 22px 0 12px; }
+    .card a, .article a { color: var(--cyan); font-weight: 750; text-decoration: none; }
+    .timeline { background: radial-gradient(circle at 50% 10%, rgba(0,102,255,.13), transparent 36%); }
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; width: min(1180px, 100%); margin: 60px auto 0; }
+    .step { padding: 26px; transition: .25s; background: rgba(13,22,38,.72); }
+    .num {
+      width: 58px; height: 58px; border-radius: 18px; display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--electric), var(--cyan));
+      box-shadow: 0 0 36px rgba(0,194,255,.28);
+      font: 900 14px ui-monospace, monospace;
+    }
+    .expertise {
+      position: relative;
+      background-image: linear-gradient(90deg, rgba(5,10,20,.96), rgba(5,10,20,.72)), url("https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?auto=format&fit=crop&w=1800&q=80");
+      background-size: cover;
+      background-position: center;
+    }
+    .split { width: min(1180px, 100%); margin: auto; display: grid; grid-template-columns: .9fr 1.1fr; gap: 56px; align-items: center; }
+    .visual { position: relative; height: 420px; border: 1px solid rgba(255,255,255,.1); border-radius: 28px; overflow: hidden; background: rgba(13,22,38,.72); box-shadow: 0 0 48px rgba(0,194,255,.22); }
+    .visual:before {
+      content: ""; position: absolute; inset: 15%; border-radius: 50%;
+      border: 1px solid rgba(0,194,255,.22);
+      box-shadow: inset 0 0 50px rgba(0,194,255,.12), 0 0 70px rgba(0,102,255,.24);
+      animation: float 7s ease-in-out infinite;
+    }
+    .visual span {
+      position: absolute; inset: 0; margin: auto; width: max-content; height: max-content;
+      border: 1px solid rgba(0,194,255,.3); border-radius: 999px;
+      background: rgba(0,194,255,.1); padding: 16px 24px; color: var(--cyan); font: 800 13px ui-monospace, monospace;
+      box-shadow: 0 0 36px rgba(0,194,255,.24);
+    }
+    .refs { margin-top: 26px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .ref {
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 18px;
+      background: rgba(255,255,255,.035);
+      padding: 15px;
+    }
+    .ref b {
+      color: var(--cyan);
+      display: block;
+      font: 900 12px ui-monospace, monospace;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .ref p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 13px; }
+    .articles { width: min(1180px, 100%); margin: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .article { overflow: hidden; transition: .25s; }
+    .image { height: 210px; background-size: cover; background-position: center; transition: .6s; }
+    .article:hover .image { transform: scale(1.05); }
+    .article-body { padding: 24px; }
+    .tag { color: var(--cyan); font: 800 12px ui-monospace, monospace; }
+    .cta {
+      text-align: center;
+      background: radial-gradient(circle at 25% 20%, rgba(0,102,255,.24), transparent 34%), radial-gradient(circle at 75% 45%, rgba(124,58,237,.24), transparent 32%), var(--surface);
+    }
+    .contact { display: grid; grid-template-columns: 1.5fr .8fr; gap: 26px; width: min(1180px, 100%); margin: auto; }
+    .form, .side { padding: 28px; }
+    .field { height: 58px; border-radius: 18px; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.035); margin-bottom: 14px; padding: 18px; color: var(--muted); }
+    .field.big { height: 130px; }
+    @keyframes pulse { 50% { filter: drop-shadow(0 0 24px rgba(0,255,178,.65)); } }
+    @keyframes word { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+    @keyframes up { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
+    @keyframes float { 50% { transform: translateY(-16px) scale(1.03); } }
+    @media (max-width: 900px) {
+      .links { display: none; }
+      .stats, .steps, .articles, .split, .contact, .refs { grid-template-columns: 1fr; }
+      .services { grid-template-columns: 1fr; }
+      .card, .card:nth-child(n+4) { grid-column: auto; }
+      .nav { padding: 0 20px; }
+      section, .hero { padding-left: 20px; padding-right: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="switches">
+    <button id="langSwitch" type="button">EN</button>
+  </div>
+  <nav class="nav">
+    <div class="logo"><div class="shield">◆</div> iConsulting</div>
+    <div class="links"><span>Home</span><span>Services</span><span>Insights</span><span>About</span><span>Contact</span></div>
+    <a class="btn" href="#contact">Book a Consultation →</a>
+  </nav>
+  <main>
+    <section class="hero">
+      <canvas id="particles"></canvas>
+      <div class="wrap">
+        <div class="badge"><i class="dot"></i> <span data-i18n="trustedBadge">Trusted Security Partner · Cybersecurity & IT Audit</span></div>
+        <h1><span data-i18n="heroSecure">Secure.</span><span data-i18n="heroAudit">Audit.</span><span data-i18n="heroTransform">Transform.</span></h1>
+        <p class="lead" data-i18n="heroSub">We design, audit and secure your information systems for a controlled digital future.</p>
+        <div class="actions">
+          <a class="btn" href="#contact"><span data-i18n="bookConsultation">Book a Consultation</span> →</a>
+          <a class="btn ghost" href="#services"><span data-i18n="discoverServices">Discover Services</span> →</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="ring"><b>82%</b></div><p data-i18n="statRisk">Risk Exposure Reduced</p></div>
+          <div class="stat"><div class="ring"><b>68%</b></div><p data-i18n="statGovernance">Governance Maturity Improved</p></div>
+          <div class="stat"><div class="ring"><b>91%</b></div><p data-i18n="statBaseline">Security Baseline Score</p></div>
+        </div>
+      </div>
+    </section>
+    <section id="services">
+      <div class="section-head">
+        <div class="eyebrow">Services</div>
+        <h2 data-i18n="servicesTitle">High-trust advisory for digital systems that must hold.</h2>
+        <p class="muted" data-i18n="servicesText">A focused portfolio for leaders who need clarity across risk, security, governance and transformation.</p>
+      </div>
+      <div class="services">
+        <div class="card"><div class="icon">✓</div><h3 data-i18n="serviceAuditTitle">IT Audit & Governance</h3><p data-i18n="serviceAuditDesc" class="muted">Independent audits that clarify control maturity and expose gaps.</p><a><span data-i18n="learnMore">Learn more</span> →</a></div>
+        <div class="card"><div class="icon">▧</div><h3 data-i18n="serviceProjectTitle">IS Project Review</h3><p data-i18n="serviceProjectDesc" class="muted">Structured reviews before budget, architecture or delivery drift becomes expensive.</p><a><span data-i18n="learnMore">Learn more</span> →</a></div>
+        <div class="card"><div class="icon">↗</div><h3 data-i18n="serviceDigitalTitle">Digital Transformation</h3><p data-i18n="serviceDigitalDesc" class="muted">Secure roadmaps translating strategy into operating models and platforms.</p><a><span data-i18n="learnMore">Learn more</span> →</a></div>
+        <div class="card"><div class="icon">⌁</div><h3 data-i18n="serviceCyberTitle">Cybersecurity Assessment</h3><p data-i18n="serviceCyberDesc" class="muted">Baseline assessments across identity, infrastructure, endpoints and policies.</p><a><span data-i18n="learnMore">Learn more</span> →</a></div>
+        <div class="card"><div class="icon">◎</div><h3 data-i18n="servicePentestTitle">Penetration Testing</h3><p data-i18n="servicePentestDesc" class="muted">Controlled offensive testing with proof-of-impact reporting.</p><a><span data-i18n="learnMore">Learn more</span> →</a></div>
+        <div class="card"><div class="icon">▣</div><h3 data-i18n="serviceHardeningTitle">Device Hardening</h3><p data-i18n="serviceHardeningDesc" class="muted">Configuration baselines that reduce attack surface without slowing operations.</p><a><span data-i18n="learnMore">Learn more</span> →</a></div>
+        <div class="card"><div class="icon">▤</div><h3 data-i18n="serviceAdminTitle">IT Administration</h3><p data-i18n="serviceAdminDesc" class="muted">Reliable support for infrastructure, identity and continuity.</p><a><span data-i18n="learnMore">Learn more</span> →</a></div>
+      </div>
+    </section>
+    <section class="timeline">
+      <div class="section-head"><div class="eyebrow">Process</div><h2 data-i18n="processTitle">A controlled sequence from diagnosis to transformation.</h2></div>
+      <div class="steps">
+        <div class="step"><div class="num">01</div><h3 data-i18n="processDiagnose">Diagnose</h3><p data-i18n="processDiagnoseText" class="muted">Understand the environment, controls and strategic constraints.</p></div>
+        <div class="step"><div class="num">02</div><h3 data-i18n="processRisks">Identify Risks</h3><p data-i18n="processRisksText" class="muted">Prioritize exposure through evidence, impact and likelihood.</p></div>
+        <div class="step"><div class="num">03</div><h3 data-i18n="processSecure">Secure Infrastructure</h3><p data-i18n="processSecureText" class="muted">Apply controls, hardening and monitoring where it matters.</p></div>
+        <div class="step"><div class="num">04</div><h3 data-i18n="processTransform">Transform Systems</h3><p data-i18n="processTransformText" class="muted">Move from remediation to a resilient operating model.</p></div>
+      </div>
+    </section>
+    <section class="expertise">
+      <div class="split">
+        <div>
+          <div class="eyebrow">Methodology</div>
+          <h2 data-i18n="expertiseTitle">Built on international audit and cybersecurity references.</h2>
+          <p class="muted" data-i18n="expertiseText">Our methodology uses recognized frameworks as anchors, then adapts controls, evidence and priorities to each organization.</p>
+          <div class="refs">
+            <div class="ref"><b>ISO/IEC 27001</b><p>Information security governance, controls and continual improvement.</p></div>
+            <div class="ref"><b>NIST CSF</b><p>Identify, Protect, Detect, Respond and Recover as a cyber risk model.</p></div>
+            <div class="ref"><b>NIST 800-53</b><p>Security and privacy control families for complex environments.</p></div>
+            <div class="ref"><b>EBIOS RM</b><p>Scenario-based risk analysis for critical assets and business impact.</p></div>
+            <div class="ref"><b>COBIT</b><p>IT governance, accountability and value alignment.</p></div>
+            <div class="ref"><b>CIS Controls</b><p>Prioritized safeguards for hardening and operations.</p></div>
+          </div>
+        </div>
+        <div class="visual"><span>GLOBAL CONTROL FABRIC</span></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-head"><div class="eyebrow">Insights</div><h2>Signals for safer digital decisions.</h2></div>
+      <div class="articles">
+        <div class="article"><div class="image" style="background-image:url('https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?auto=format&fit=crop&w=900&q=80')"></div><div class="article-body"><span data-i18n="categorySecurity" class="tag">Security</span><h3 data-i18n="insightOneTitle">How SMEs Can Build a Practical Security Baseline</h3><p data-i18n="insightOneExcerpt" class="muted">A pragmatic sequence for identity, endpoints, backups and governance.</p><a><span data-i18n="read">Read</span> →</a></div></div>
+        <div class="article"><div class="image" style="background-image:url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=900&q=80')"></div><div class="article-body"><span data-i18n="categoryAudit" class="tag">Audit</span><h3 data-i18n="insightTwoTitle">Audit Evidence That Executives Actually Use</h3><p data-i18n="insightTwoExcerpt" class="muted">Moving beyond checklists into decision-grade reporting.</p><a><span data-i18n="read">Read</span> →</a></div></div>
+        <div class="article"><div class="image" style="background-image:url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=900&q=80')"></div><div class="article-body"><span data-i18n="categoryTransformation" class="tag">Transformation</span><h3 data-i18n="insightThreeTitle">Designing an SDSI Roadmap Without Losing Control</h3><p data-i18n="insightThreeExcerpt" class="muted">Connect ambition, architecture and cybersecurity into one portfolio.</p><a><span data-i18n="read">Read</span> →</a></div></div>
+      </div>
+    </section>
+    <section class="cta">
+      <h2 data-i18n="ctaTitle">Let's secure your information system.</h2>
+      <p class="muted" data-i18n="ctaText">Start with a focused conversation about your risks, systems and priorities.</p>
+      <p><a class="btn" href="#contact"><span data-i18n="bookConsultation">Book a Consultation</span> →</a></p>
+    </section>
+    <section id="contact">
+      <div class="section-head"><div class="eyebrow">Contact</div><h2 data-i18n="contactHero">Book a focused conversation.</h2></div>
+      <div class="contact">
+        <div class="form"><div data-i18n="formName" class="field">Full Name *</div><div data-i18n="formEmail" class="field">Professional Email *</div><div data-i18n="formService" class="field">Service *</div><div data-i18n="formMessage" class="field big">Message *</div><a class="btn" style="width:100%"><span data-i18n="bookConsultation">Book Consultation</span> →</a></div>
+        <div class="side"><h3 data-i18n="whatToExpect">What to expect</h3><p data-i18n="responseDay" class="muted">✓ Response in 1 business day</p><p data-i18n="confidential" class="muted">✓ Confidential assessment</p><p data-i18n="noCommitment" class="muted">✓ No commitment required</p><p class="muted"><span data-i18n="secureChannel">Secure consultation channel</span><br><span data-i18n="officeHours">Office hours · Mon-Fri</span></p></div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const fr = {
+      trustedBadge: "Partenaire securite de confiance · Cybersecurite & Audit IT",
+      heroSecure: "Securiser.",
+      heroAudit: "Auditer.",
+      heroTransform: "Transformer.",
+      heroSub: "Nous concevons, auditons et securisons vos systemes d'information pour un avenir numerique maitrise.",
+      bookConsultation: "Planifier une consultation",
+      discoverServices: "Decouvrir les services",
+      statRisk: "Exposition au risque reduite",
+      statGovernance: "Maturite de gouvernance amelioree",
+      statBaseline: "Score de base securite",
+      servicesTitle: "Conseil de haute confiance pour des systemes numeriques critiques.",
+      servicesText: "Un portefeuille cible pour les dirigeants qui ont besoin de clarte sur les risques, la securite, la gouvernance et la transformation.",
+      serviceAuditTitle: "Audit IT & Gouvernance",
+      serviceAuditDesc: "Des audits independants qui clarifient la maturite des controles et revelent les ecarts.",
+      serviceProjectTitle: "Revue de projets SI",
+      serviceProjectDesc: "Des revues structurees avant que les derives de budget, d'architecture ou de livraison ne deviennent couteuses.",
+      serviceDigitalTitle: "Transformation digitale",
+      serviceDigitalDesc: "Des feuilles de route securisees qui traduisent la strategie en modeles operationnels et plateformes.",
+      serviceCyberTitle: "Evaluation cybersecurite",
+      serviceCyberDesc: "Des evaluations de base sur l'identite, l'infrastructure, les endpoints et les politiques.",
+      servicePentestTitle: "Tests d'intrusion",
+      servicePentestDesc: "Des tests offensifs controles avec reporting preuve d'impact.",
+      serviceHardeningTitle: "Durcissement des equipements",
+      serviceHardeningDesc: "Des baselines de configuration qui reduisent la surface d'attaque sans ralentir les operations.",
+      serviceAdminTitle: "Administration IT",
+      serviceAdminDesc: "Un support fiable pour l'infrastructure, l'identite et la continuite.",
+      learnMore: "En savoir plus",
+      processTitle: "Une sequence maitrisee du diagnostic a la transformation.",
+      processDiagnose: "Diagnostiquer",
+      processDiagnoseText: "Comprendre l'environnement, les controles et les contraintes strategiques.",
+      processRisks: "Identifier les risques",
+      processRisksText: "Prioriser l'exposition a partir des preuves, de l'impact et de la vraisemblance.",
+      processSecure: "Securiser l'infrastructure",
+      processSecureText: "Appliquer les controles, le durcissement et la surveillance la ou c'est essentiel.",
+      processTransform: "Transformer les systemes",
+      processTransformText: "Passer de la remediation a un modele operationnel resilient.",
+      expertiseTitle: "Construit sur des references internationales d'audit et de cybersecurite.",
+      expertiseText: "Notre methodologie s'appuie sur des cadres reconnus, puis adapte les controles, les preuves et les priorites a chaque organisation.",
+      ctaTitle: "Securisons votre systeme d'information.",
+      ctaText: "Commencez par une conversation ciblee sur vos risques, vos systemes et vos priorites.",
+      categorySecurity: "Securite",
+      categoryAudit: "Audit",
+      categoryTransformation: "Transformation",
+      insightOneTitle: "Comment les PME peuvent construire une baseline securite pratique",
+      insightOneExcerpt: "Une sequence pragmatique pour l'identite, les endpoints, les sauvegardes et la gouvernance.",
+      insightTwoTitle: "Des preuves d'audit vraiment utiles aux dirigeants",
+      insightTwoExcerpt: "Depasser les checklists pour produire un reporting decisionnel.",
+      insightThreeTitle: "Concevoir une feuille de route SDSI sans perdre le controle",
+      insightThreeExcerpt: "Relier ambition, architecture et cybersecurite dans un meme portefeuille.",
+      read: "Lire",
+      contactHero: "Planifiez une conversation ciblee.",
+      formName: "Nom complet *",
+      formEmail: "Email professionnel *",
+      formService: "Service *",
+      formMessage: "Message *",
+      whatToExpect: "A quoi s'attendre",
+      responseDay: "✓ Reponse sous 1 jour ouvrable",
+      confidential: "✓ Evaluation confidentielle",
+      noCommitment: "✓ Sans engagement",
+      secureChannel: "Canal de consultation securise",
+      officeHours: "Heures de bureau · Lun-Ven"
+    };
+    const en = new Map();
+    let lang = "en";
+    document.getElementById("langSwitch").onclick = () => {
+      lang = lang === "en" ? "fr" : "en";
+      document.getElementById("langSwitch").textContent = lang.toUpperCase();
+      document.querySelectorAll("[data-i18n]").forEach(node => {
+        const key = node.dataset.i18n;
+        if (!en.has(key)) en.set(key, node.textContent);
+        node.textContent = lang === "fr" ? (fr[key] || en.get(key)) : en.get(key);
+      });
+    };
+    const canvas = document.getElementById("particles");
+    const ctx = canvas.getContext("2d");
+    let w, h, points = [], mouse = { x: -9999, y: -9999 };
+    function resize() {
+      const r = devicePixelRatio || 1;
+      w = canvas.offsetWidth; h = canvas.offsetHeight;
+      canvas.width = w * r; canvas.height = h * r;
+      ctx.setTransform(r,0,0,r,0,0);
+      points = Array.from({ length: Math.min(115, Math.max(46, Math.round(w*h/18000))) }, () => ({
+        x: Math.random()*w, y: Math.random()*h, vx: (Math.random()-.5)*.35, vy: (Math.random()-.5)*.35
+      }));
+    }
+    function loop() {
+      ctx.clearRect(0,0,w,h);
+      const g = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 280);
+      g.addColorStop(0, "rgba(0,194,255,.15)"); g.addColorStop(1, "transparent");
+      ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+      points.forEach(p => {
+        const dx = p.x - mouse.x, dy = p.y - mouse.y, d = Math.hypot(dx,dy);
+        if (d < 120) { p.vx += dx/d*.012; p.vy += dy/d*.012; }
+        p.x += p.vx; p.y += p.vy; p.vx *= .992; p.vy *= .992;
+        if (p.x < 0 || p.x > w) p.vx *= -1;
+        if (p.y < 0 || p.y > h) p.vy *= -1;
+      });
+      for (let i=0;i<points.length;i++) for (let j=i+1;j<points.length;j++) {
+        const a=points[i], b=points[j], d=Math.hypot(a.x-b.x,a.y-b.y);
+        if (d < 135) { ctx.strokeStyle = `rgba(0,194,255,${.18*(1-d/135)})`; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); }
+      }
+      points.forEach(p => { ctx.fillStyle = "rgba(240,244,255,.75)"; ctx.beginPath(); ctx.arc(p.x,p.y,1.4,0,Math.PI*2); ctx.fill(); });
+      requestAnimationFrame(loop);
+    }
+    canvas.addEventListener("mousemove", e => { const r = canvas.getBoundingClientRect(); mouse.x=e.clientX-r.left; mouse.y=e.clientY-r.top; });
+    canvas.addEventListener("mouseleave", () => { mouse.x=-9999; mouse.y=-9999; });
+    addEventListener("resize", resize); resize(); loop();
+  </script>
+</body>
+</html>
