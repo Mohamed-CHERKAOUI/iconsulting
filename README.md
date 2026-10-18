@@ -1,6 +1,8 @@
 # iConsulting — Nouveau site
 
-Refonte originale en français : accueil, expertises, 6 pages de prestations (les 7 activités initiales sont conservées, durcissement et administration étant regroupés), cabinet, ressources, 3 articles complets, contact, confidentialité, remerciement et 404.
+Refonte originale bilingue français/anglais, à portée internationale : accueil, expertises, 6 pages de prestations (les 7 activités initiales sont conservées, durcissement et administration étant regroupés), cabinet, ressources, 3 articles complets, contact, confidentialité, remerciement et 404. Chaque page dispose d’une version anglaise sous `/en` et d’un sélecteur FR/EN pointant vers la même page dans l’autre langue. Les liens internes conservent la langue, et le changement de langue conserve les paramètres de l’URL (dont la prestation sélectionnée).
+
+Téléphone cliquable : **+33 7 46 57 71 97** (`tel:+33746577197`). WhatsApp : **https://wa.me/33746577197**, accessible depuis le contact, le pied de page et un bouton flottant. Le lien ouvre une discussion ; le visiteur choisit lui-même d’envoyer un message.
 
 ## Aperçu local
 
@@ -12,7 +14,7 @@ node check.mjs
 node server.mjs
 ```
 
-Ouvrir http://127.0.0.1:4173. Les sources éditoriales et les gabarits sont dans `build.mjs`. Les styles, scripts, polices et images sont dans `dist/assets` (ces fichiers sont des sources suivies dans Git et doivent être conservés).
+Ouvrir http://127.0.0.1:4173. Les sources éditoriales et les gabarits sont dans `build.mjs`, les traductions complètes dans `translations-en.mjs`, et la génération des pages bilingues dans `internationalize.mjs`. Une traduction manquante provoque une erreur de construction plutôt qu’une page partiellement traduite. Les styles, scripts, polices et images sont dans `dist/assets` (ces fichiers sont des sources suivies dans Git et doivent être conservés).
 
 ## Vercel
 
