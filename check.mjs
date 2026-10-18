@@ -35,6 +35,22 @@ assert.match(contact,/action="https:\/\/formsubmit.co\/contact@iconsultingcabine
 for(const field of ['name','email','message','consent'])assert.match(contact,new RegExp(`id="${field}"[^>]*required`),`${field} must be required`);
 assert.match(contact,/name="_honey"/);
 assert.doesNotMatch(contact,/name="_captcha" value="false"/);
+for(const [prefix,pdf] of [['','iconsulting-plaquette-fr.pdf'],['en/','iconsulting-brochure-en.pdf']]){
+ const appointment=await readFile(path.join(root,prefix+'rendez-vous.html'),'utf8');
+ assert.match(appointment,/class="contact-form appointment-form"/);
+ assert.match(appointment,/name="fuseau_horaire" value="GMT \(UTC\+0\)"/);
+ assert.match(appointment,/name="date_souhaitee" type="date" required/);
+ assert.match(appointment,/name="heure_souhaitee_GMT" type="time" required/);
+ assert.match(appointment,new RegExp(`name="_next" value="[^"]+/${prefix}merci-rendez-vous"`));
+ assert.match(appointment,/action="https:\/\/formsubmit.co\/contact@iconsultingcabinet.com"/);
+ const home=await readFile(path.join(root,prefix?'en.html':'index.html'),'utf8');
+ assert.ok(home.includes(`/assets/documents/${pdf}`));
+ const file=await readFile(path.join(root,'assets/documents',pdf));
+ assert.equal(file.subarray(0,5).toString(),'%PDF-');
+ assert.ok(file.length>10000);
+ const missions=await readFile(path.join(root,prefix+'missions.html'),'utf8');
+ assert.match(missions,prefix?/ILLUSTRATIVE SCENARIOS/:/SCÉNARIOS ILLUSTRATIFS/);
+}
 const css=await readFile(path.join(root,'assets/style.css'),'utf8');
 assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
 assert.doesNotMatch(css,/https:\/\//);
@@ -48,5 +64,10 @@ if(process.env.CHECK_URL){
  }
  const missing=await fetch(new URL('/page-inexistante-test',process.env.CHECK_URL));
  assert.equal(missing.status,404);
+ for(const pdf of ['iconsulting-plaquette-fr.pdf','iconsulting-brochure-en.pdf']){
+   const response=await fetch(new URL('/assets/documents/'+pdf,process.env.CHECK_URL));
+   assert.equal(response.status,200);
+   assert.match(response.headers.get('content-type'),/application\/pdf/);
+ }
  console.log(`PASS: ${entries.length} HTTP routes and custom 404.`);
 }

@@ -4,6 +4,13 @@ Refonte originale bilingue français/anglais, à portée internationale : accuei
 
 Téléphone cliquable : **+33 7 46 57 71 97** (`tel:+33746577197`). WhatsApp : **https://wa.me/33746577197**, accessible depuis le contact, le pied de page et un bouton flottant. Le lien ouvre une discussion ; le visiteur choisit lui-même d’envoyer un message.
 
+## Nouveaux parcours commerciaux
+
+- `/missions` et `/en/missions` : trois scénarios d’accompagnement explicitement illustratifs. Ils ne sont pas présentés comme des missions passées ou des références clients. Remplacer les scénarios par des cas réels uniquement lorsque leurs faits sont validés.
+- `/rendez-vous` et `/en/rendez-vous` : demande de premier échange de 30 minutes avec date, heure et format souhaités. Le fuseau est fixe : **GMT (UTC+0)**. Les créneaux passés sont refusés. Le numéro de téléphone devient obligatoire pour les formats appel téléphonique et WhatsApp. L’email envoyé à contact@iconsultingcabinet.com précise la date et l’heure en GMT ; le rendez-vous est à confirmer manuellement par email. Aucune disponibilité n’est automatiquement garantie et aucun événement d’agenda n’est créé.
+- Deux plaquettes commerciales de quatre pages sont téléchargeables depuis l’accueil, les ressources et le pied de page. Les PDF livrés se trouvent dans `dist/assets/documents/`. Leurs sources sont dans `create-brochures.py`, qui utilise ReportLab et pypdf. Les PDF sont déjà fournis et **ne nécessitent pas Python pour déployer le site** ; Python est utilisé uniquement pour les recréer.
+- Les confirmations de demande de rendez-vous disposent d’une page dédiée, distincte d’une confirmation de réservation définitive.
+
 ## Aperçu local
 
 Node.js 20 ou plus, sans dépendances :

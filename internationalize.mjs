@@ -42,7 +42,7 @@ export async function writeEnglishPage(html,route,out,base){
    if(/^<\/script/.test(part))inScript=false;
    return part.replace(/\b(aria-label|placeholder|alt)="([^"]+)"/g,(_,key,value)=>`${key}="${translateText(value)}"`)
     .replace(/(<meta (?:name="description"|property="og:(?:title|description)") content=")([^"]+)(")/g,(_,a,value,b)=>a+translateText(value)+b)
-    .replace(/value="(Nouvelle demande de contact — iConsulting|Demande de réponse acceptée)"/g,(_,value)=>`value="${translateText(value)}"`);
+    .replace(/value="(Nouvelle demande de contact — iConsulting|Demande de rendez-vous — iConsulting|Demande de réponse acceptée)"/g,(_,value)=>`value="${translateText(value)}"`);
   }
   if(inScript)return part;
   return translateText(part);
@@ -53,7 +53,8 @@ export async function writeEnglishPage(html,route,out,base){
  en=en.replace(/(<a class="language-switch"[^>]*href=")[^"]+/,`$1${routeUrl(route,'fr')}`);
  en=en.replace(/<link rel="canonical"[^>]*>|<meta property="og:url"[^>]*>|<link rel="alternate"[^>]*>/g,'');
  en=en.replace('</head>',languageMeta(base,route,'en')+'</head>');
- en=en.replace(/(name="_next" value=")[^"]+/,`$1${base}/en/merci`);
+ en=en.replace(/(name="_next" value=")([^"]+)/,(_,prefix,url)=>prefix+url.replace(base+'/',base+'/en/'));
+ en=en.replaceAll('/assets/documents/iconsulting-plaquette-fr.pdf','/assets/documents/iconsulting-brochure-en.pdf');
  en=en.replace(/© (\d+) iConsulting\. Tous droits réservés\./g,'© $1 iConsulting. All rights reserved.');
  const filename=route?path.join(out,'en',route+'.html'):path.join(out,'en.html');
  await mkdir(path.dirname(filename),{recursive:true});

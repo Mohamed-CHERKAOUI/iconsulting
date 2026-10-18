@@ -1,6 +1,7 @@
 import { mkdir, writeFile, readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { prepareFrenchPage, writeEnglishPage } from './internationalize.mjs';
+import { enrichCommercialPage, writeCommercialPages } from './commercial.mjs';
 const out = path.resolve('dist');
 await mkdir(out, {recursive:true});
 const base = (process.env.SITE_URL || 'https://www.iconsultingcabinet.com').replace(/\/$/, '');
@@ -57,7 +58,8 @@ for(const a of articles)await writeFile(path.join(out,'eclairages',a.slug+'.html
 await writeFile(path.join(out,'confidentialite.html'),layout('Confidentialité','Informations sur le traitement des demandes envoyées à iConsulting.',`${pageHead('CONFIDENTIALITÉ','Vos informations.<br><em>Un usage défini.</em>','Cette notice décrit le traitement des informations transmises par le formulaire de contact.')}<article class="article-body container"><section><h2>Les informations demandées</h2><p>Le formulaire recueille votre nom, votre email, le sujet et le contenu de votre demande. Le nom de l’entreprise et le numéro de téléphone sont facultatifs. Ne transmettez pas de mots de passe, données de santé, documents confidentiels ou autres informations sensibles.</p></section><section><h2>La finalité</h2><p>Ces informations servent à lire votre demande, vous recontacter et préparer un éventuel échange professionnel. Le formulaire n’inscrit pas à une newsletter.</p></section><section><h2>La transmission</h2><p>Le formulaire utilise le service FormSubmit pour acheminer la demande vers contact@iconsultingcabinet.com. FormSubmit traite donc les données envoyées. Sa documentation indique une conservation des soumissions dans son archive pendant 30 jours. La vérification anti-spam du service peut faire intervenir reCAPTCHA.</p><p>Consultez la <a href="https://formsubmit.co/privacy.pdf" target="_blank" rel="noopener noreferrer">politique de confidentialité de FormSubmit</a> pour les détails de ce service.</p></section><section><h2>Vos demandes concernant vos données</h2><p>Pour demander une information, une correction ou une suppression des données communiquées à iConsulting, écrivez à <a href="mailto:contact@iconsultingcabinet.com">contact@iconsultingcabinet.com</a>.</p></section><section><h2>Navigation sur ce site</h2><p>Le code de ce site n’intègre ni outil de mesure d’audience, ni traceur publicitaire. L’hébergeur peut traiter les données techniques nécessaires à la distribution et à la sécurité des pages. Les images et les éléments graphiques sont servis depuis le site.</p></section></article>`));
 await writeFile(path.join(out,'merci.html'),layout('Demande transmise','Votre demande de contact iConsulting.',`<section class="container thank-you"><span class="success-mark" aria-hidden="true">✓</span><span class="eyebrow">MERCI POUR VOTRE CONFIANCE</span><h1>La conversation<br><em>peut commencer.</em></h1><p>Votre formulaire a été transmis au service d’envoi.<br>L’équipe iConsulting reviendra vers vous à l’adresse indiquée.</p><a class="button" href="/">Revenir à l’accueil ${arrow}</a><p class="muted">Vous pouvez également nous écrire à<br><a href="mailto:contact@iconsultingcabinet.com">contact@iconsultingcabinet.com</a>.</p></section>`,'','<meta name="robots" content="noindex">'));
 await writeFile(path.join(out,'404.html'),layout('Page introuvable','Cette page n’existe pas.',`<section class="container thank-you"><span class="eyebrow">ERREUR 404</span><h1>Reprenons<br><em>la bonne direction.</em></h1><p>Cette page n’existe pas ou a changé d’adresse.</p><a class="button" href="/">Revenir à l’accueil ${arrow}</a></section>`,'','<meta name="robots" content="noindex">'));
-const pages=['','services','cabinet','contact','ressources','confidentialite',...services.map(x=>'expertises/'+x.slug),...articles.map(x=>'eclairages/'+x.slug)];
+await writeCommercialPages({out,base,layout,pageHead,cta,services});
+const pages=['','services','cabinet','contact','ressources','missions','rendez-vous','confidentialite',...services.map(x=>'expertises/'+x.slug),...articles.map(x=>'eclairages/'+x.slug)];
 await writeFile(path.join(out,'sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${pages.flatMap(p=>[`${base}/${p}`,`${base}/en${p?'/'+p:''}`]).map(url=>`<url><loc>${url}</loc></url>`).join('')}</urlset>`);
 await writeFile(path.join(out,'robots.txt'),`User-agent: *\nAllow: /\nSitemap: ${base}/sitemap.xml\n`);
 for (const entry of await readdir(out,{recursive:true})) {
@@ -65,9 +67,9 @@ for (const entry of await readdir(out,{recursive:true})) {
   const file=path.join(out,entry);
   let html=(await readFile(file,'utf8')).replace(/<br>(?!\s)/g,'<br> ');
   const route=entry.replaceAll('\\','/').replace(/index\.html$/,'').replace(/\.html$/,'');
-  html=prepareFrenchPage(html,route,base);
+  html=prepareFrenchPage(enrichCommercialPage(html,route),route,base);
   if(entry==='index.html')html=html.replace('</head>',`<script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'Organization',name:'iConsulting',url:base,email:'contact@iconsultingcabinet.com',telephone:'+33746577197',logo:base+'/assets/mark.svg',areaServed:'Worldwide'})}</script></head>`);
   await writeFile(file,html);
   await writeEnglishPage(html,route,out,base);
 }
-console.log(`Built ${(pages.length+2)*2} French and English pages in ${out}`);
+console.log(`Built ${(pages.length+3)*2} French and English pages in ${out}`);
