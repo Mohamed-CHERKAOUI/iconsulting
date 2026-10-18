@@ -24,3 +24,14 @@ const css=await readFile(path.join(root,'assets/style.css'),'utf8');
 assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
 assert.doesNotMatch(css,/https:\/\//);
 console.log(`PASS: ${entries.length} pages, ${links} internal links and assets, metadata, contact recipient, required fields, honeypot, spam protection, reduced motion.`);
+if(process.env.CHECK_URL){
+ for(const entry of entries){
+  const route=entry.replaceAll('\\','/').replace(/index\.html$/,'').replace(/\.html$/,'');
+  const response=await fetch(new URL('/'+route,process.env.CHECK_URL));
+  assert.equal(response.status,200,`HTTP ${route}`);
+  assert.match(response.headers.get('content-type'),/text\/html/);
+ }
+ const missing=await fetch(new URL('/page-inexistante-test',process.env.CHECK_URL));
+ assert.equal(missing.status,404);
+ console.log(`PASS: ${entries.length} HTTP routes and custom 404.`);
+}
